@@ -6,7 +6,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 script {
-                    def repoUrl = "https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+                    def repoUrl = "https://github.com/yaash007/devops.git"
 
                     checkout([$class: 'GitSCM',
                         branches: [[name: '*/main']],
