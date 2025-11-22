@@ -2,62 +2,35 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+
+        stage('Clone Repo') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
-                userRemoteConfigs: [[url: 'https://github.com/yaash007/devops.git']]])
+                git url: 'https://github.com/yaash007/devops.git', branch: 'main'
             }
         }
 
-        stage('Install Nginx If Needed') {
+        stage('Deploy to NGINX') {
             steps {
                 sh '''
-                if ! command -v nginx &> /dev/null
-                then
-                    echo "Installing nginx..."
-                    sudo apt update -y
-                    sudo apt install nginx -y
-                else
-                    echo "Nginx already installed."
-                fi
+                sudo cp index.html /var/www/html/
+                sudo chown www-data:www-data /var/www/html/index.html
+                sudo chmod 644 /var/www/html/index.html
                 '''
             }
         }
 
-        stage('Deploy Website Files') {
+        stage('Restart NGINX') {
             steps {
                 sh '''
-            
-
-                echo "Copying new index.html..."
-                sudo cp -f index.html /var/www/html/index.html
-
-                echo "Deployment completed."
-                '''
-            }
-        }
-
-        stage('Restart Nginx') {
-            steps {
-                sh '''
-                echo "Restarting nginx..."
                 sudo systemctl restart nginx
-
-                echo "===== NGINX STATUS ====="
-                sudo systemctl status nginx --no-pager
+                echo "Deployed Successfully!"
                 '''
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Verify') {
             steps {
-                sh '''
-                echo "===== Files in /var/www/html ====="
-                ls -ltr /var/www/html
-
-                echo "===== Checking website output ====="
-                curl -I localhost
-                '''
+                sh 'curl -I localhost'
             }
         }
     }
