@@ -27,8 +27,8 @@ pipeline {
         stage('Deploy Website Files') {
             steps {
                 sh '''
-                echo "Cleaning old files..."
-                sudo rm -rf /var/www/html/*
+             #   echo "Cleaning old files..."
+             #   sudo rm -rf /var/www/html/*
 
                 echo "Copying new index.html..."
                 sudo cp -f index.html /var/www/html/index.html
