@@ -10,7 +10,7 @@ pipeline {
 
                     checkout([$class: 'GitSCM',
                         branches: [[name: '*/main']],
-                        userRemoteConfigs: [[url: repoUrl]]
+                        userRemoteConfigs: [[url: "https://github.com/yaash007/devops.git"]]
                     ])
                 }
             }
