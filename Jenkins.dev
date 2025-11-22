@@ -1,1 +1,62 @@
+pipeline {
+    agent any  // required in declarative style (not node block)
+    
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                script {
+                    def repoUrl = "https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[url: repoUrl]]
+                    ])
+                }
+            }
+        }
+
+        stage('Install Nginx If Needed') {
+            steps {
+                sh '''
+                if ! which nginx > /dev/null; then
+                    echo "Nginx not found, installing..."
+                    sudo apt-get update -y
+                    sudo apt-get install nginx -y
+                else
+                    echo "Nginx already installed."
+                fi
+                '''
+            }
+        }
+
+        stage('Deploy Website Files') {
+            steps {
+                sh '''
+                sudo rm -rf /var/www/html/*
+                sudo cp -r * /var/www/html/
+                '''
+            }
+        }
+
+        stage('Restart Nginx') {
+            steps {
+                sh '''
+                sudo systemctl restart nginx
+                echo "===== NGINX STATUS ====="
+                sudo systemctl status nginx --no-pager
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                echo "===== Files in /var/www/html ====="
+                ls -ltr /var/www/html
+                '''
+            }
+        }
+    }
+}
 
